@@ -1,0 +1,42 @@
+# Go build artifacts
+/bin/
+/build/
+/dist/
+*.exe
+*.test
+*.out
+
+# Go modules
+vendor/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependency directories (remove the comment below if you use vendoring)
+/vendor/
+
+# Logs and temp
+*.log
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+.env
+.env.*
+docker-compose.override.yml
+
+# Test output
+coverage.out
+
+# Базы данных локальные
+*.db
+
+# Бинарники
+/go-subscription-service
