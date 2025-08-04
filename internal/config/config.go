@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log"
+	"go-subscription-service/pkg/logger"
 	"os"
 )
 
@@ -18,7 +18,7 @@ func Load() *Config {
 
 	dsn := os.Getenv("DB_URL")
 	if dsn == "" {
-		log.Fatal("Environment variable DB_URL is required but not set")
+		logger.Fatal("Environment variable DB_URL is required but not set")
 	}
 
 	return &Config{

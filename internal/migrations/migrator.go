@@ -2,8 +2,8 @@ package migrations
 
 import (
 	"go-subscription-service/internal/model"
+	"go-subscription-service/pkg/logger"
 	"gorm.io/gorm"
-	"log"
 )
 
 func Run(db *gorm.DB) {
@@ -11,6 +11,6 @@ func Run(db *gorm.DB) {
 		&model.Subscription{},
 	)
 	if err != nil {
-		log.Fatalf("migration failed: %v", err)
+		logger.Fatalf("migration failed: %v", err)
 	}
 }

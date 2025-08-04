@@ -29,3 +29,7 @@ func Errorf(template string, args ...interface{}) {
 func Fatalf(template string, args ...interface{}) {
 	log.Fatalf(template, args...)
 }
+
+func Fatal(args ...interface{}) {
+	log.Fatal(args...)
+}
