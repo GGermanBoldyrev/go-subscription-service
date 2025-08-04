@@ -1,3 +1,10 @@
+// @title Subscription Service API
+// @version 1.0
+// @description REST API для управления онлайн-подписками пользователей
+// @host localhost:8080
+// @BasePath /
+// @schemes http
+
 package main
 
 import (
@@ -12,6 +19,7 @@ import (
 
 	"github.com/joho/godotenv"
 
+	_ "go-subscription-service/docs"
 	"go-subscription-service/internal/app"
 	"go-subscription-service/pkg/logger"
 )

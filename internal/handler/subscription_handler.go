@@ -27,6 +27,17 @@ func (h *HTTPHandler) RegisterRoutes(router *chi.Mux) {
 	})
 }
 
+// CreateSubscription godoc
+// @Summary Создать новую подписку
+// @Description Создает запись о подписке пользователя
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param subscription body model.Subscription true "Данные подписки"
+// @Success 201 {object} model.Subscription
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /subscriptions [post]
 func (h *HTTPHandler) CreateSubscription(w http.ResponseWriter, r *http.Request) {
 	var sub model.Subscription
 	if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
@@ -45,6 +56,18 @@ func (h *HTTPHandler) CreateSubscription(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// GetSubscription godoc
+// @Summary Получить подписку по ID
+// @Description Возвращает информацию о подписке по её ID
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID подписки"
+// @Success 200 {object} model.Subscription
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /subscriptions/{id} [get]
 func (h *HTTPHandler) GetSubscription(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -70,6 +93,18 @@ func (h *HTTPHandler) GetSubscription(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateSubscription godoc
+// @Summary Обновить подписку
+// @Description Изменяет данные подписки по ID
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID подписки"
+// @Param subscription body model.Subscription true "Данные подписки"
+// @Success 200 {object} model.Subscription
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /subscriptions/{id} [put]
 func (h *HTTPHandler) UpdateSubscription(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -97,6 +132,17 @@ func (h *HTTPHandler) UpdateSubscription(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// DeleteSubscription godoc
+// @Summary Удалить подписку
+// @Description Удаляет подписку по ID
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path string true "UUID подписки"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /subscriptions/{id} [delete]
 func (h *HTTPHandler) DeleteSubscription(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -114,6 +160,15 @@ func (h *HTTPHandler) DeleteSubscription(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// ListSubscriptions godoc
+// @Summary Получить список подписок
+// @Description Возвращает список всех подписок
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Subscription
+// @Failure 500 {object} map[string]string
+// @Router /subscriptions [get]
 func (h *HTTPHandler) ListSubscriptions(w http.ResponseWriter, r *http.Request) {
 	subs, err := h.subscriptionService.List(r.Context())
 	if err != nil {
