@@ -7,6 +7,7 @@ import (
 	"go-subscription-service/internal/model"
 	"go-subscription-service/internal/service"
 	"net/http"
+	"time"
 )
 
 type HTTPHandler struct {
@@ -19,11 +20,15 @@ func NewHTTPHandler(subSvc *service.SubscriptionService) *HTTPHandler {
 
 func (h *HTTPHandler) RegisterRoutes(router *chi.Mux) {
 	router.Route("/subscriptions", func(r chi.Router) {
+		// CRUD
 		r.Post("/", h.CreateSubscription)
 		r.Get("/{id}", h.GetSubscription)
 		r.Put("/{id}", h.UpdateSubscription)
 		r.Delete("/{id}", h.DeleteSubscription)
 		r.Get("/", h.ListSubscriptions)
+
+		// CUSTOM
+		r.Get("/subscriptions/total", h.GetSubscriptionsTotal)
 	})
 }
 
@@ -179,4 +184,54 @@ func (h *HTTPHandler) ListSubscriptions(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return
 	}
+}
+
+// GetSubscriptionsTotal godoc
+// @Summary Получить суммарную стоимость подписок за период
+// @Description Считает сумму подписок за выбранный период с фильтрами по user_id и service_name
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param user_id query string false "UUID пользователя"
+// @Param service_name query string false "Название сервиса"
+// @Param from query string true "Дата начала периода (YYYY-MM-DD)"
+// @Param to query string true "Дата конца периода (YYYY-MM-DD)"
+// @Success 200 {object} map[string]int "total"
+// @Failure 400 {object} map[string]string
+// @Router /subscriptions/total [get]
+func (h *HTTPHandler) GetSubscriptionsTotal(w http.ResponseWriter, r *http.Request) {
+	userIDStr := r.URL.Query().Get("user_id")
+	serviceName := r.URL.Query().Get("service_name")
+	fromStr := r.URL.Query().Get("from")
+	toStr := r.URL.Query().Get("to")
+
+	from, err := time.Parse("2006-01-02", fromStr)
+	if err != nil {
+		http.Error(w, "Invalid 'from' date", http.StatusBadRequest)
+		return
+	}
+	to, err := time.Parse("2006-01-02", toStr)
+	if err != nil {
+		http.Error(w, "Invalid 'to' date", http.StatusBadRequest)
+		return
+	}
+
+	var userID *uuid.UUID
+	if userIDStr != "" {
+		uid, err := uuid.Parse(userIDStr)
+		if err != nil {
+			http.Error(w, "Invalid 'user_id'", http.StatusBadRequest)
+			return
+		}
+		userID = &uid
+	}
+
+	total, err := h.subscriptionService.TotalPrice(r.Context(), userID, serviceName, from, to)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]int{"total": total})
 }

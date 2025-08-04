@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"go-subscription-service/internal/model"
 	"gorm.io/gorm"
+	"time"
 )
 
 type SubscriptionRepository struct {
@@ -46,4 +47,25 @@ func (r *SubscriptionRepository) List(ctx context.Context) ([]*model.Subscriptio
 		return nil, err
 	}
 	return subs, nil
+}
+
+func (r *SubscriptionRepository) TotalPrice(
+	ctx context.Context,
+	userID *uuid.UUID,
+	serviceName string,
+	from, to time.Time,
+) (int, error) {
+	var total int64
+	db := r.db.WithContext(ctx).Model(&model.Subscription{}).
+		Where("start_date >= ? AND start_date <= ?", from, to)
+
+	if userID != nil {
+		db = db.Where("user_id = ?", *userID)
+	}
+	if serviceName != "" {
+		db = db.Where("service_name = ?", serviceName)
+	}
+
+	err := db.Select("SUM(price)").Scan(&total).Error
+	return int(total), err
 }

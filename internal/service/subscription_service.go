@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"go-subscription-service/internal/model"
 	"go-subscription-service/internal/repository"
+	"time"
 )
 
 type SubscriptionService struct {
@@ -33,4 +34,13 @@ func (s *SubscriptionService) Delete(ctx context.Context, id uuid.UUID) error {
 
 func (s *SubscriptionService) List(ctx context.Context) ([]*model.Subscription, error) {
 	return s.repo.List(ctx)
+}
+
+func (s *SubscriptionService) TotalPrice(
+	ctx context.Context,
+	userID *uuid.UUID,
+	serviceName string,
+	from, to time.Time,
+) (int, error) {
+	return s.repo.TotalPrice(ctx, userID, serviceName, from, to)
 }
